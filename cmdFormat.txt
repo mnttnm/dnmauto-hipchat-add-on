@@ -1,0 +1,30 @@
+/DnmAutoHippy Command Operation ON Environment FOR Project AT Time
+
+Command: Run/Stop/Status
+
+Operation: smoke/sanity/regression
+		   recording/screenshare
+
+Environment: prod/stage/qa cluster
+			 a1/a2/a3/a4 or z1/z2/z3/z4
+			 a1&a2/a1&a4 (order will depend on the command)
+			 a1&a2&a4
+			 
+Project: Denim -> for all the jobs.
+		 Room System
+		 Skinny
+		 WebRTC
+		 Carmel etc.
+
+		 if given anything other than denim or project throw error.
+
+
+
+/DenimAuto Run sanity on z1&z2&z3 for denim
+
+
+
+Stop command:
+Room system -> For stopping it call stop api on individual job.
+http://10.5.100.89:8080/view/Denim-DashBoard/view/Dashboard-Denim/job/RoomSystem-Polycom-TestSuite/1414/stop
+

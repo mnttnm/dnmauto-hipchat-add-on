@@ -1,0 +1,103 @@
+{
+
+	"RoomSystem" : {
+		"job_url" : "http://10.5.100.89:8080/view/Denim-DashBoard/view/Dashboard-Denim/job/Roomsystem-Parallel-Runner/buildWithParameters",
+		"Env" : "a2",
+		"PolycomTags": "@polycom-smoke,@polycom-sanity",
+		"PolycomTagsMv" : "@polycom-smoke,@polycom-sanity",
+		"TandbergTags" : "@tandberg-smoke,@tandberg-sanity",
+		"TandbergTagsMv" : "@tandberg-smoke,@tandberg-sanity",
+		"LifeSizeTags" : "@lifesize-smoke,@lifesize-sanity",
+		"EmailReportTo" : "denim-auto@bluejeansnet.com,denim-qa@bluejeansnet.com"
+	},	
+	"Lync" : {
+		"job_url":"http://10.5.100.89:8080/view/Denim-DashBoard/view/Dashboard-Denim/job/Lync-Parallel-Runner/buildWithParameters",
+		"Env" : "a2",
+		"Tag" : "@lync-smoke,@lync-sanity",
+		"EmailReportTo" : "denim-auto@bluejeansnet.com,denim-qa@bluejeansnet.com",
+	},
+	"Hangouts" : {
+		"job_url":"http://10.5.100.89:8080/view/Denim-DashBoard/view/Dashboard-Denim/job/Hangouts-TestSuite/",
+		"Cluster": "z3-bjnbeta",
+		"Tags": "@hangouts_smoke,@hangouts_sanity",
+		"PolycomRoomSystem": "Polycom-blr",
+		"TandbergRoomSystem" : "Tandberg-ex60-blr",
+		"Hub": "10.5.6.141",
+		"EmailReportTo" : "denim-auto@bluejeansnet.com,denim-qa@bluejeansnet.com",
+		"JobName" : "Hangouts_Automation",
+		"Browser" : "Chrome"
+	},
+	"Partner_Integration" : {
+		"job_url" : "http://10.5.100.89:8080/view/Denim-DashBoard/view/Dashboard-Denim/job/Partner_Integration_Parallel_Job/buildWithParameters",
+		"EnvIntercall": "z1",
+		"TagsIntercall": "@intercall-twilio-smoke,@intercall-twilio-sanity",
+		"EnvLevel3": "z1",
+		"TagsLevel3":"@level3-twilio-smoke,@level3-twilio-sanity",
+		"EnvPstn":"z1",
+		"TagsPstn":"@pstn-twilio-smoke,@pstn-twilio-sanity",
+		"EmailReportTo":"denim-auto@bluejeansnet.com,denim-qa@bluejeansnet.com"
+	},
+	"LyncOnMac" : {
+		"Environment":"z2",
+		"Tags":"@lync-mac-smoke,@lync-mac-sanity",
+		"LyncUser":"Arpit Jain",
+		"EmailReportTo":"denim-auto@bluejeansnet.com,denim-qa@bluejeansnet.com",
+		"JobName":"Lync On Mac"
+	},
+	"Pstn_Pairing": {
+		"Environment":"a2",
+		"Tags":"@pstn-pairing-smoke,@pstn-pairing-sanity",
+		"EmailReportTo":"denim-auto@bluejeansnet.com,denim-qa@bluejeansnet.com",
+		"Branch" :"master",
+		"hubUrl":"10.5.6.238",
+	},
+	"Pstn" : {
+		"Environment":"z2",
+		"TestTags":"@pstn-twilio-smoke,@pstn-twilio-sanity",
+		"JobName":"Pstn",
+		"EmailReportTo":"denim-auto@bluejeansnet.com,denim-qa@bluejeansnet.com"
+	},
+	"Skinny" : {
+		"job_url" : "http://10.5.100.89:8080/view/Denim-DashBoard/view/Dashboard-Denim/job/Skinny-Tests/buildWithParameters",
+		"Environment":"a2",
+		"Tags":"@skinny-smoke,@skinny-sanity",
+		"ModeratorMachine":"MacAir",
+		"ParticipantMachine":"Win8",
+		"EmailReportTo":"denim-auto@bluejeansnet.com,denim-qa@bluejeansnet.com",
+		"PropertyTag":"jf3",
+		"Branch": "master"
+	},
+	"Skinny1" : {
+		"job_url" : "http://10.5.100.89:8080/view/Denim-DashBoard/view/Dashboard-Denim/job/Skinny-Tests-1/buildWithParameters",
+		"Environment":"a21",
+		"Tags":"@skinny-smoke,@skinny-sanity",
+		"ModeratorMachine":"Ubuntu1",
+		"ParticipantMachine":"Fedora",
+		"EmailReportTo":"denim-auto@bluejeansnet.com,denim-qa@bluejeansnet.com",
+		"PropertyTag":"jf3",
+		"Branch": "master"
+	},
+	"Skinny_Multipop" : {
+		"job_url":"http://10.5.100.89:8080/view/Denim-DashBoard/view/Dashboard-Denim/job/Skinny_MultiPop_Job/buildWithParameters",
+		"Tags":"@njf-smoke&~@njf-004&~@njf-005",
+		"Env":"a2",
+		"EmailReportTo":"denim-auto@bluejeansnet.com,denim-qa@bluejeansnet.com"
+	},
+	"Webrtc" : {
+		"job_url" : "http://10.5.100.89:8080/view/Denim-DashBoard/view/WebRTC/job/WebRTC_Chrome_Stable/buildWithParameters",
+		"Env": "a2JF3",
+		"Tags" : "@webrtc-smoke,@webrtc-sanity",
+		"ModeratorMachine": "10.5.6.254",
+		"ParticipantMachine": "10.5.7.203",
+		"EmailReportTo":"denim-auto@bluejeansnet.com,denim-qa@bluejeansnet.com"
+	},
+	"Carmel" :{ 
+		"job_url" : "http://10.5.100.89:8080/view/Denim-DashBoard/view/Carmel/job/CWin-7/buildWithParameters",
+		"Environment": "carmel/carmel-a2",
+		"Tags": "@car-smoke,@car-sanity&~@sikuli",
+		"EmailReportTo":"denim-auto@bluejeansnet.com,denim-qa@bluejeansnet.com",
+		"ModeratorMachine" : "10.5.7.211",
+		"ParticipantMachine" : "10.5.7.80",
+		"JF3" : true
+	}
+}
