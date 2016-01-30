@@ -1,6 +1,7 @@
 var request = require('request');
 var cors = require('cors');
 var uuid = require('uuid');
+var fs = require('fs'); 
 
 // This is the heart of your HipChat Connect add-on. For more information,
 // take a look at https://developer.atlassian.com/hipchat/guide
@@ -151,6 +152,7 @@ module.exports = function (app, addon) {
       commandInfo.environment = "";
       commandInfo.project = "";
 
+  var jobList = require("../jobList.json");
 
   // This is an example route to handle an incoming webhook
   // https://developer.atlassian.com/hipchat/guide/webhooks
@@ -158,7 +160,8 @@ module.exports = function (app, addon) {
     addon.authenticate(),
     function (req, res) {
 
-      var command = req.body.item.message.message; //command will get the complete message passed from hipchat.
+      var command = req.body.item.message.message;  //command will get the complete message passed from hipchat.
+
 
       buildUrlObject = generateBuildUrl(command);
       if (buildUrlObject && buildUrlObject.buildUrl.length > 0 )  {
@@ -196,16 +199,10 @@ module.exports = function (app, addon) {
       }
     });
 
-  
-  function runBuild() {
-    
-  }
-
 
   function generateBuildUrl(command) {
       commandInfo = parseCommand(command);
       //We can have one more parameter which can have values like http reponsecode for indicating that this function was successfurl or not.
-
 
       if( commandInfo && commandInfo.command === "") {
         console.log("command info is empty");
@@ -214,17 +211,55 @@ module.exports = function (app, addon) {
       }
 
       else {
-        if(commandInfo.command.toLowerCase().indexOf('run') > -1)  {
-          if(buildUrlObject) {
-          buildUrlObject.message = "Denim automation will run " + commandInfo.operation + " for " + commandInfo.project + " on " + commandInfo.environment;
-                  //For testing
-          buildUrlObject.buildUrl = "http://10.5.100.89:8080/view/Denim-DashBoard/view/WebRTC/job/WebRTC_Chrome_Stable/buildWithParameters?"+'Env='+commandInfo.environment;
-          console.log(buildUrlObject);
-          return buildUrlObject;
-        }
+        //based on run/stop or status we will form our urls
+        switch (commandInfo.command.toLowerCase())  {
+          case "run": 
+              if(commandInfo) {
+                switch (commandInfo.project){
+                    case "denim":
+                          buildUrlObject.message = "Denim automation will run " + commandInfo.operation + " on " + commandInfo.environment; 
+                          buildUrlObject.buildUrl = []; //will return array of build urls for denim.  
+                          break;  
+                    default:
+                          console.log("generating build url for " + commandInfo.project);
+                          buildUrlObject.message = "Denim automation will run " + commandInfo.operation + " on " + commandInfo.environment + " for " + commandInfo.project; 
+                          if(jobList.hasOwnProperty(commandInfo.project)) {
+                              var currentProject = jobList[commandInfo.project];
+                              console.log("project choosen is: " + JSON.stringify(currentProject));
+                          }
+                          if((JSON.stringify(currentProject.Env)).indexOf('same') > -1) {
+                            console.log("en is saaaamee")
+                             var Env = commandInfo.environment;
+                          }
+                          else{
+                            Env = currentProject.Env[commandInfo.environment];
+                          }
+                          // var Env = (JSON.stringify(currentProject.Env)) == "same" ? commandInfo.environment : currentProject.Env[commandInfo.environment];
+                          var Tag;
+                          if(commandInfo.operation.toLowerCase().indexOf('smoke') > -1) {
+                            Tag = currentProject.smoke;
+                          }
+                          else if(commandInfo.operation.toLowerCase().indexOf('sanity') > -1) {
+                            Tag = currentProject.sanity;
+                          }
+                          else {
+                            console.log('Operation mentioned by you can not performed!');
+                          }
+                          buildUrlObject.buildUrl = currentProject.job_url + '?' + currentProject.mapping.Env + "=" + Env + "&" + currentProject.mapping.Tag + "=" +Tag;                    
+                 }
+                console.log(buildUrlObject);
+                return buildUrlObject;
+              }
+          case "stop" : console.log('stop function not present');
+                        break;
+
+          case "status":console.log('status function not present');
+                        break;
+          default: console.log("command you entered are not present please try again!");
         }
       }
   }
+
 
   function parseCommand(cmd) {
 

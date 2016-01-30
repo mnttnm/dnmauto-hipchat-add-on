@@ -1,0 +1,249 @@
+{
+	"Webrtc" : {
+		"job_url": "http://10.5.100.89:8080/view/Denim-DashBoard/view/WebRTC/job/WebRTC_Chrome_Stable/buildWithParameters",
+		"Env": {
+			"a1": "a1JF3",
+			"a2": "a2JF3",
+			"a4": "a4JF3",
+			"z1": "z1JF3",
+			"z2": "z2JF3",
+			"z4": "z4JF3",
+			"q1": "q1JF3",
+			"q2": "q2JF3",
+			"q3": "q3JF3"
+		},
+		"mapping": {
+			"Env": "Env",
+			"Tag": "Tag"
+		},
+		"sanity": "@webrtc-smoke,@webrtc-sanity",
+		"smoke": "@webrtc-smoke"
+	},
+	"RoomSystem": {
+		"job_url": "http://10.5.100.89:8080/view/Denim-DashBoard/view/Dashboard-Denim/job/Roomsystem-Parallel-Runner/buildWithParameters",
+		"Env": "same",
+		"smoke": {
+			"PolycomTagsMv": "@polycom-smoke",
+			"PolycomTagsMv": "@polycom-smoke",
+			"TandbergTags": "@tandberg-smoke",
+			"TandbergTagsMv": "@tandberg-smoke",
+			"LifeSizeTags": "@lifesize-smoke"
+		},
+		"sanity": {
+			"PolycomTags": "@polycom-smoke,@polycom-sanity",
+			"PolycomTagsMv": "@polycom-smoke,@polycom-sanity",
+			"TandbergTags": "@tandberg-smoke,@tandberg-sanity",
+			"TandbergTagsMv": "@tandberg-smoke,@tandberg-sanity",
+			"LifeSizeTags": "@lifesize-smoke,@lifesize-sanity"
+		},
+		"mapping": {
+			"Env": "Env",
+			"Tag": ["PolycomTags", "PolycomTagsMv", "TandbergTags", "TandbergTagsMv", "LifeSizeTags"]
+		}
+	},
+	"Lync" : {
+		"job_url": "http://10.5.100.89:8080/view/Denim-DashBoard/view/Dashboard-Denim/job/Lync-Parallel-Runner/buildWithParameters",
+		"Env": "same",
+		"sanity": "@lync-smoke,@lync-sanity",
+		"EmailReportTo": "denim-auto@bluejeansnet.com,denim-qa@bluejeansnet.com",
+		"smoke": "@lync-smoke",
+		"mapping": {
+			"Env": "Env",
+			"Tag": "Tag"
+		}
+	},
+	"Hangouts": {
+		"job_url": "http://10.5.100.89:8080/view/Denim-DashBoard/view/Dashboard-Denim/job/Hangouts-TestSuite/",
+		"Cluster": "z3-bjnbeta",
+		"sanity": "@hangouts_smoke,@hangouts_sanity",
+		"smoke": "@hangouts_smoke",
+		"mapping": {
+			"Env": "Env",
+			"Tag": "Tag"
+		}
+	},
+	"Partner_Integration": {
+		"job_url": "http://10.5.100.89:8080/view/Denim-DashBoard/view/Dashboard-Denim/job/Partner_Integration_Parallel_Job/buildWithParameters",
+		"Env": "same",
+		"mapping": {
+			"Env": ["EnvIntercall", "EnvLevel3", "EnvPstn"],
+			"Tag": ["TagsLevel3", "TagsIntercall", "TagsPstn"]
+		},
+		"smoke": {
+			"TagsLevel3": "@level3-twilio-smoke",
+			"TagsIntercall": "@intercall-twilio-smoke",
+			"TagsPstn": "@pstn-twilio-smoke"
+		},
+		"sanity": {
+			"TagsLevel3": "@level3-twilio-smoke,@level3-twilio-sanity",
+			"TagsIntercall": "@intercall-twilio-smoke,@intercall-twilio-sanity",
+			"TagsPstn": "@pstn-twilio-smoke,@pstn-twilio-sanity"
+		}
+	},
+	"LyncOnMac": {
+		"job_url": "http://10.5.100.89:8080/view/Denim-DashBoard/view/Dashboard-Denim/job/LyncOnMac/build/buildWithParameters",
+		"Environment": "z2",
+		"sanity": "@lync-mac-smoke,@lync-mac-sanity",
+		"smoke": "@lync-mac-smoke",
+		"mapping": {
+			"Env": "Environment",
+			"Tag": "Tags"
+		}
+	},
+	"Pstn_Pairing": {
+		"job_url": "http://10.5.100.89:8080/view/Denim-DashBoard/view/Dashboard-Denim/job/Pstn-Pairing/buildWithParameters",
+		"Environment": "a2",
+		"sanity": "@pstn-pairing-smoke,@pstn-pairing-sanity",
+		"smoke": "@pstn-pairing-smoke",
+		"mapping": {
+			"Env": "Environment",
+			"Tag": "Tags"
+		}
+	},
+	"Pstn": {
+		"job_url": "http://10.5.100.89:8080/view/Denim-DashBoard/view/Dashboard-Denim/job/PSTN-Test-Suite/buildWithParameters",
+		"Env": "same",
+		"sanity": "@pstn-twilio-smoke,@pstn-twilio-sanity",
+		"smoke": "@pstn-twilio-smoke",
+		"mapping": {
+			"Env": "Environment",
+			"Tag": "TestTags"
+		}
+	},
+	"Skinny": {
+		"job_url": "http://10.5.100.89:8080/view/Denim-DashBoard/view/Dashboard-Denim/job/Skinny-Tests/buildWithParameters",
+		"Env": "same",
+		"sanity": "@skinny-smoke,@skinny-sanity",
+		"smoke": "@skinny-smoke",
+		"mapping": {
+			"Env": "Env",
+			"Tag": "Tags"
+		}
+	},
+	"Skinny1": {
+		"job_url": "http://10.5.100.89:8080/view/Denim-DashBoard/view/Dashboard-Denim/job/Skinny-Tests-1/buildWithParameters",
+		"Evv": {
+			"a1": "a11",
+			"a2": "a21",
+			"a4": "a41",
+			"z1": "z11",
+			"z2": "z21",
+			"z4": "z41",
+			"q1": "q11",
+			"q2": "q21",
+			"q3": "q31"
+		},
+		"sanity": "@skinny-smoke,@skinny-sanity",
+		"smoke": "@skiny-smoke",
+		"mapping": {
+			"Env": "Env",
+			"Tag": "Tags"
+		}
+	},
+	"Skinny_Multipop": {
+		"job_url": "http://10.5.100.89:8080/view/Denim-DashBoard/view/Dashboard-Denim/job/Skinny_MultiPop_Job/buildWithParameters",
+		"Env": "same",
+		"mapping": {
+			"Env": "Env",
+			"Tag": "Tag"
+		},
+		"smoke": "@njf-smoke&~@njf-004&~@njf-005",
+		"sanity": "@njf-smoke&~@njf-004&~@njf-005"
+	},
+
+	"Carmel": {
+		"job_url": "http://10.5.100.89:8080/view/Denim-DashBoard/view/Carmel/job/CWin-7/buildWithParameters",
+		"Env": {
+			"a1": "carmel/carmel-a1",
+			"a2": "carmel/carmel-a2",
+			"a4": "carmel/carmel-a3",
+			"z1": "carmel/carmel-z1",
+			"z2": "carmel/carmel-z2",
+			"z4": "carmel/carmel-z4",
+			"q1": "carmel/carmel-q1",
+			"q2": "carmel/carmel-q2",
+			"q3": "carmel/carmel-q3"
+		},
+		"sanity": "@car-smoke,@car-sanity&~@sikuli",
+		"smoke": "@car-smoke&~@sikuli",
+		"mapping": {
+			"Env": "Env",
+			"Tag": "Tags"
+		}
+	},
+
+	"Tandberg": {
+		"job_url": "http://10.5.100.89:8080/job/RoomSystem-Tandberg-TestSuite/buildWithParameters",
+		"Env": "same",
+		"sanity": "@tandberg-sanity,@tandberg-smoke",
+		"smoke": "@tandberg-smoke",
+		"mapping": {
+			"Env": "Cluster",
+			"Tag": "Tags"
+		}
+	},
+
+	"TandbergMv": {
+		"job_url": "http://10.5.100.89:8080/job/RoomSystem-Tandberg-TestSuite-MV/buildWithParameters",
+		"Env": "same",
+		"sanity": "@tandberg-sanity,@tandberg-smoke",
+		"smoke": "@tandberg-smoke",
+		"mapping": {
+			"Env": "Cluster",
+			"Tag": "Tags"
+		}
+	},
+
+	"PolycomMv": {
+		"job_url": "http://10.5.100.89:8080/job/RoomSystem-Polycom-TestSuite-MV/buildWithParameters",
+		"Env": "same",
+		"sanity": "@polycom-smoke,@polycom-sanity",
+		"smoke": "@polycom-smoke",
+		"mapping": {
+			"Env": "Cluster",
+			"Tag": "Tags"
+		}
+	},
+
+	"Polycom": {
+		"job_url": "http://10.5.100.89:8080/job/RoomSystem-Polycom-TestSuite/buildWithParameters",
+		"Env": "same",
+		"sanity": "@polycom-smoke,@polycom-sanity",
+		"smoke": "@polycom-smoke",
+		"mapping": {
+			"Env": "Cluster",
+			"Tag": "Tags"
+		}
+	},
+
+	"Lifesize": {
+		"job_url": "http://10.5.100.89:8080/job/RoomSystem-Lifesize-TestSuite/buildWithParameters",
+		"Env": "same",
+		"sanity": "@lifesize-smoke,@lifesize-sanity",
+		"smoke": "@lifesize-smoke",
+		"mapping": {
+			"Env": "Cluster",
+			"Tag": "Tags"
+		}
+	},
+	"Intercall": {
+		"job_url": "http://10.5.100.89:8080/view/Denim-DashBoard/view/Dashboard-Denim/job/Intercall-Test-Suite/buildWithParameters",
+		"Env": "same",
+		"sanity": "@intercall-twilio-smoke,@intercall-twilio-sanity",
+		"smoke": "@intercall-twilio-smoke",
+		"mapping": {
+			"Env": "Environment",
+			"Tag": "Tags"
+		}
+	},
+	"Level3": {
+		"job_url": "http://10.5.100.89:8080/view/Denim-DashBoard/view/Dashboard-Denim/job/Level3-Test-Suite/buildWithParameters",
+		"Env": "same",
+		"sanity": "@level3-twilio-smoke,@level3-twilio-sanity",
+		"smoke": "@level3-twilio-smoke",
+		"mapping": {
+			"Env": "Environment",
+			"Tag": "Tags"
+		}
+	}
+}
