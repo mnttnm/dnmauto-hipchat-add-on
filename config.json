@@ -6,13 +6,13 @@
     // need to use a local tunnel tool (we highly recommend https://ngrok.com)
     // to make your local add-on server accessible from the internet. You'll also
     // need to specify this property with the base URL of your tunnel:
-    "localBaseUrl": "https://b8b7cd51.ngrok.io",
+    "localBaseUrl": "http://2c576891.ngrok.io",
 
     // HipChat add-ons don't use asymmetric key algos
     "usePublicKey": false,
     // HipChat add-ons don't support auto registration with HipChat.com so
     // might as well disable watching the atlassian-connect.json file
-    "watch": false,
+    "watch": true,
 
     // This is the port your Express server will listen on
     "port": 3000,

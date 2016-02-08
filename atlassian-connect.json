@@ -1,6 +1,6 @@
 {
     "key": "dnmAutoHippy-bluejeans",
-    "name": "DnmAutoHippy!",
+    "name": "DnmAutomator!",
     "description": "A add on for triggering Denim Automation runs",
     "vendor": {
         "name": "Mohit Tater",
@@ -25,14 +25,14 @@
         },
         "webhook": {
             "url": "{{localBaseUrl}}/webhook",
-            "pattern": "^/dnmAutoHippy",
+            "pattern": "^/DenimAutomator",
             "event": "room_message",
-            "name": "DnmAutoHippy"
+            "name": "DenimAutomator"
         },
         "glance": [
             {
                "name": {
-                   "value": "Hello!"
+                   "value": "DenimAutomator"
                },
                "queryUrl": "{{localBaseUrl}}/glance",
                "key": "dnmAutoHippy.glance",
@@ -47,43 +47,10 @@
             {
                 "key": "dnmAutoHippy.sidebar",
                 "name": {
-                    "value": "Hello Sidebar!"
+                    "value": "DnmAuto!"
                 },
                 "location": "hipchat.sidebar.right",
                 "url": "{{localBaseUrl}}/sidebar"
-            }
-        ],
-        "dialog": [
-            {
-                "key": "dnmAutoHippy.dialog",
-                "title": {
-                    "value": "Hello Dialog!"
-                },
-                "url": "{{localBaseUrl}}/dialog",
-                "options": {
-                  "style": "normal",
-                  "primaryAction": {
-                    "name": {
-                      "value": "Say Hello!"
-                    },
-                    "key": "dnmAutoHippy.save",
-                    "enabled": true
-                  },
-                  "size": {
-                    "width": "400px",
-                    "height": "200px"
-                  }
-                }
-            }
-        ],
-        "action": [
-            {
-                "key": "dnmAutoHippy.action",
-                "name": {
-                    "value": "Launch Hello Dialog!"
-                },
-                "target": "dnmAutoHippy.dialog",
-                "location": "hipchat.input.action"
             }
         ]
     }

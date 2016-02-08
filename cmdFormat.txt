@@ -1,6 +1,6 @@
-/DnmAutoHippy Command Operation ON Environment FOR Project AT Time
+/DenimAutomator Command Operation ON Environment FOR Project AT Time
 
-Command: Run/Stop/Status
+Command: Run/Stop/Status/Disable
 
 Operation: smoke/sanity/regression
 		   recording/screenshare
@@ -19,12 +19,19 @@ Project: Denim -> for all the jobs.
 		 if given anything other than denim or project throw error.
 
 
+Run Command:
+/DenimAutomator Run smoke on z1 for denim
 
-/DenimAuto Run sanity on z1&z2&z3 for denim
-
-
+-> make the command case insensitive.
+-> implement command for env combinations.
+-> 
 
 Stop command:
+/DenimAutomator Stop Webrtc:
+It will stop all the jobs which are running or which are scheduled to run.
 Room system -> For stopping it call stop api on individual job.
 http://10.5.100.89:8080/view/Denim-DashBoard/view/Dashboard-Denim/job/RoomSystem-Polycom-TestSuite/1414/stop
 
+
+Disable command:
+For disable command we will call disable api with one of our access token.
