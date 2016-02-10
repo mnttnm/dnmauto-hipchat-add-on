@@ -5,6 +5,7 @@ var fs = require('fs');
 var u_ = require('underscore');
 var http = require('http');
 var Promise = require("bluebird");
+var Q = require('q');
 
 // This is the heart of your HipChat Connect add-on. For more information,
 // take a look at https://developer.atlassian.com/hipchat/guide
@@ -281,12 +282,13 @@ module.exports = function (app, addon) {
                           else {
                             console.log('Operation mentioned by you can not performed!');
                           } 
-                          buildUrlObject = getBuildStopUrl(jobUrl);   
+                          
+                          buildUrlObject = getBuildStopUrl(jobUrl).then(function(buildUrlObject){
+                              return buildUrlObject;
+                          });   
                           break;                 
                   }
-                return buildUrlObject;
-                break;
-
+              
           case "status":console.log('status function not present');
                         return buildUrlObject;
                         break;
@@ -300,7 +302,7 @@ module.exports = function (app, addon) {
   function getBuildStopUrl(jobUrl) {
     var jobStatusApi = jobUrl + 'api/json';
     var buildStopObject = [];
-    function getBuildStopObjct(buildStop) {
+       function getBuildStopObjct(buildStop) {
          if(buildStop.buildId !== ""){
             if(buildStop.isQueue) {
               buildStopObject = [buildStop.buildId, true];
@@ -311,12 +313,11 @@ module.exports = function (app, addon) {
          }
          console.log("build stop object: " + buildStopObject);
          return buildStopObject;
+        }
+    return Q.nfcall(jobUrl).then(getBuildId(jobStatusApi)).then(getBuildStopObjct(buildToStop));
     }
-    return getBuildId(jobStatusApi, getBuildStopObjct);
-  }
 
-
-  function getBuildId(jobUrl, callback) {
+  function getBuildId(jobUrl) {
        var lastBuild = "";
        var lastCompletedBuild = "";
        var isQueue = false;
@@ -324,8 +325,8 @@ module.exports = function (app, addon) {
        var buildId = [];
 
         console.log('calling job api with url: ' + jobUrl)
-        request({url:jobUrl,method:'GET'}, 
-            function (error, response, body) {
+        return Q.nfcall(request({url:jobUrl,method:'GET'}, 
+                function (error, response, body) {
                  if (!error && response.statusCode == 200) {
                       // console.log('json reponse for build api: '+body);
                       lastBuild = JSON.parse(body).lastBuild.number;
@@ -340,28 +341,27 @@ module.exports = function (app, addon) {
                  }
                  if(lastBuild != lastCompletedBuild) {
                   if(!isQueue) {
-                   callback ({
+                    return {
                     "buildId" : lastBuild,
                     "message" : "Only job running is with build no " + lastBuild,
-                    "isQueue" : false
-                   })
+                    "isQueue" : false }
                   }
                   else {
-                   callback({
+                    return {
                     "buildId" : lastBuild,
                     "message" : "multiple job scheduled",
                     "isQueue" : true
-                   })
+                  }
                   }
                  }
                 else {
-                 callback( {
+                  return {
                   "buildId" : "",
                   "message" : "Nothing to abort!",
                   "isQueue" : false
-                 })
+                  }
                }
-        });
+        }));
   }
 
   function parseCommand(cmd) {

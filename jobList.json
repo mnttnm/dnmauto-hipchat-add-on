@@ -157,8 +157,8 @@
 			"Env": "Env",
 			"Tag": "Tag"
 		},
-		"smoke": "@njf-smoke&~@njf-004&~@njf-005",
-		"sanity": "@njf-smoke&~@njf-004&~@njf-005",
+		"smoke": "@njf-smoke%26~@njf-004%26~@njf-005",
+		"sanity": "@njf-smoke%26~@njf-004%26~@njf-005",
 		"includeInSanity": true
 	},
 
@@ -188,8 +188,8 @@
 			"q2": "carmel/carmel-q2",
 			"q3": "carmel/carmel-q3"
 		},
-		"sanity":"@car-smoke,@car-sanity&~@sikuli",
-		"smoke":"@car-smoke&~@sikuli",
+		"sanity":"@car-smoke,@car-sanity%26~@sikuli",
+		"smoke":"@car-smoke%26~@sikuli",
 		"mapping": {
 			"Env": "Environment",
 			"Tag": "Tags"
