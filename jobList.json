@@ -176,7 +176,7 @@
 
 
 	"Carmel": {
-		"job_url": "http://10.5.100.89:8080/view/Denim-DashBoard/view/WebRTC/job/Win-8.1/",
+		"job_url": "http://10.5.100.89:8080/view/Denim-DashBoard/view/Carmel/job/CWin-7/",
 		"Env": {
 			"a1": "carmel/carmel-a1",
 			"a2": "carmel/carmel-a2",
@@ -191,7 +191,7 @@
 		"sanity":"@car-smoke,@car-sanity%26~@sikuli",
 		"smoke":"@car-smoke%26~@sikuli",
 		"mapping": {
-			"Env": "Environment",
+			"Env": "Env",
 			"Tag": "Tags"
 		},
 		"includeInSanity": true
