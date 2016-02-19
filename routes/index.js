@@ -390,7 +390,7 @@ module.exports = function (app, addon) {
                     }, 
                     function (error, response, body) {
                        if (!error && response.statusCode >= 200) {
-                         // console.log('status for the request is' + response.statusCode);
+                         console.log('status for the request is' + response.statusCode);
                           var msg = "Job you requested is stopped!"
                           sendMessage(msg,"green");
                        }
@@ -411,13 +411,13 @@ module.exports = function (app, addon) {
           }
           else {
             console.log(buildStopObject.message);
-            // sendMessage(buildStopObject.message, "green");
+            sendMessage(JSON.stringify(buildStopObject.message), "green");
           }
         }    
       }).done();
     }
     else {
-        var msg = "Hang on! Some issue, Try one more time with correct command";
+        var msg = "Some Issue!, Try one more time! ";
         sendMessage(msg,"red");
     }
   }
@@ -556,7 +556,7 @@ module.exports = function (app, addon) {
                 if(commandArray[0].toLowerCase() == 'stop' &&  projectName != false){
                   commandInfo.command = commandArray[0];
                   commandInfo.project = projectName;
-                  console.log(commandInfo);
+                  console.log('Command after parsing: ' + commandInfo);
                   return commandInfo;
                 }
                 else return commandInfo;
@@ -582,7 +582,7 @@ module.exports = function (app, addon) {
   }
 
   function checkIfProjectPresent(project) {
-    if(project.toLowerCase() == "denim") return project;
+    if(project.toLowerCase() == "denim") return 'Denim';
 
     var isProjectValid = u_.find(Object.keys(jobList), function(key) {
         return key.toLowerCase() === project.toLowerCase();
