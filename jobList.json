@@ -86,7 +86,7 @@
 		"includeInSanity": true
 	},
 	"LyncOnMac": {
-		"job_url": "http://10.5.100.89:8080/view/Denim-DashBoard/view/Dashboard-Denim/job/LyncOnMac/build/",
+		"job_url": "http://10.5.100.89:8080/view/Denim-DashBoard/view/Dashboard-Denim/job/LyncOnMac/",
 		"Env": "same",
 		"sanity": "@lync-mac-smoke,@lync-mac-sanity",
 		"smoke": "@lync-mac-smoke",

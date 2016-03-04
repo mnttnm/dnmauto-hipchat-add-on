@@ -225,34 +225,45 @@ module.exports = function (app, addon) {
                  }
                  break;
             case "stop" : 
-                  var stopPromise = Q.defer();
                   switch (commandInfo.project){
                     case "Denim":
+                          var finalStopArray = [];
+                          var promQ = Q.defer();
+
                           var msg = 'Stopping job for ' + commandInfo.project + ', Wait for operation confirmation!'
                           sendMessage(msg, "yellow");
 
-                          buildUrlObject.buildUrl = []; //will return array of build urls for denim.  
-                          u_.find(Object.keys(jobList), function(key) {
-                            stopJobForCurrentProject(key).then(function(data){
-                              if(data.length > 0){
-                                  stopPromise.resolve({
-                                    "message" :"Stopping all the jobs of " + commandInfo.project,
-                                    "buildId" :data[1],
-                                    "isQueue": data[2],
-                                    "jobUrl" : data[0]
+                          buildUrlObject.buildUrl = []; //will return array of build urls for denim. 
+                          var stopPromisesArray = [];
+                          stopJobForCurrentProject("denim").then(function(data){
+                              var stopPromise = Q.defer();
+                              Promise.all(data).then(function(values){
+                                  u_.each(values,function(value){
+                                    if(value.length > 0){
+                                      stopPromise.resolve({
+                                        "message" :"Stopping all the jobs of " + commandInfo.project,
+                                        "buildId" :value[1],
+                                        "isQueue": value[2],
+                                        "jobUrl" : value[0]
+                                      });
+                                    }
+                                    else {
+                                        stopPromise.resolve({
+                                          // var buildUrlObject = {};
+                                        "buildId" : "",
+                                        "message" : "There is nothing to stop for " + commandInfo.project,
+                                      });   
+                                    }
+                                    finalStopArray.push(stopPromise.promise);
+                                    promQ.resolve(finalStopArray);
                                   });
-                              }
-                              else {
-                                  stopPromise.resolve({
-                                    "buildId" : "",
-                                    "message" : "There is nothing to stop for " + commandInfo.project,
-                                  });   
-                              }
-                            });
-                              return stop (stopPromise.promise); 
-                            });
+                              });
+                          });
+                          stopJob(promQ.promise);
                           break;  
                     default:
+                          console.log('stopping single project');
+                          var stopPromise = Q.defer();
                           var msg = 'Stopping job for ' + commandInfo.project + ', Wait for operation confirmation!'
                           sendMessage(msg, "yellow");
                           stopJobForCurrentProject(commandInfo.project).then(function(data){
@@ -272,7 +283,7 @@ module.exports = function (app, addon) {
                                   });   
                               }
                           });
-                          return stop (stopPromise.promise);
+                          return stopJob (stopPromise.promise);
                     }
                     break;
               
@@ -344,8 +355,7 @@ module.exports = function (app, addon) {
       }
   }
 
-  function stop(stop){
-
+  function stopJob(stop){
     var processStopUrl = function(jobUrl,buildId) {
         console.log('stop url final: '+ jobUrl+buildId+'/stop' );
         request(
@@ -376,8 +386,8 @@ module.exports = function (app, addon) {
                        }
         });
     }
-    if (Q.isPromise(stop)) {
-      stop.then(function(buildStopObject){
+
+    var processStopPromise = function(buildStopObject){
         console.log("stop buildUrl object is: " + JSON.stringify(buildStopObject));
         
         if (Object.keys(buildStopObject).length !== 0)  {
@@ -385,7 +395,7 @@ module.exports = function (app, addon) {
             if(buildStopObject.isQueue == false){
               request(
                     {
-                      url:buildStopObject.jobUrl+buildStopObject.buildId+'/stop',
+                      url:buildStopObject.build_url+buildStopObject.buildId+'/stop',
                       method: 'POST'
                     }, 
                     function (error, response, body) {
@@ -414,8 +424,31 @@ module.exports = function (app, addon) {
             sendMessage(JSON.stringify(buildStopObject.message), "green");
           }
         }    
-      }).done();
+      };
+    // if(stop instanceof Array) {
+    //   Promise.all(stop).then(function(values){
+    //       u_.each(values, function(value){
+    //           processStopPromise(value);
+    //       })
+    //   });
+    // }
+
+    if(Q.isPromise(stop)) {
+        stop.then(function(value){
+          console.log("==================")
+          if(value instanceof Array) {
+            Promise.all(value).then(function(values){
+              u_.each(values, function(value){
+                processStopPromise(value);
+              });
+            });
+          }
+        
+          else 
+          processStopPromise(value);
+        }).done();
     }
+
     else {
         var msg = "Some Issue!, Try one more time! ";
         sendMessage(msg,"red");
@@ -440,56 +473,113 @@ module.exports = function (app, addon) {
 
   function stopJobForCurrentProject(project) {
       var prom = Q.defer();
+      var promiseArray = [];
+
       if(jobList.hasOwnProperty(project)) {
           var jobUrl  = jobList[project]['job_url'];
-          console.log("job url of projec is: " + JSON.stringify(jobUrl));
-          buildUrlObject = getBuildStopUrl(jobUrl).then(function(buildUrlObject){
-          if(buildUrlObject.length < 1) {
-            buildUrlObject.buildUrl=[];
-          }
-         prom.resolve(buildUrlObject);
-         });
-         return prom.promise;
+          console.log("job url of project is: " + JSON.stringify(jobUrl));
+          getBuildStopUrl(jobUrl).then(function(buildUrlObject){
+             console.log('resolving promise inside getBuildStopUrl');
+             prom.resolve(buildUrlObject);
+          });
+          return prom.promise;
+      }
+
+      else if (project == 'denim') {             
+              var prom = Q.defer();
+              var finalPromiseArray = [];
+              var jobUrls = [];
+
+        u_.each(Object.keys(jobList), function(key) {
+          var jobUrl  = jobList[key]['job_url'];
+          console.log("job url of project is: " + JSON.stringify(jobUrl));
+          jobUrls.push(jobUrl);
+        });
+
+        getBuildStopUrl(jobUrls).then(function(promiseArray) {
+          // if(promiseArray instanceof Promise) {
+            // console.log('* * * * * * * *');
+            //  console.log('resolving promise inside getBuildStopUrl');
+            //     u_.each(promiseArray, function(value){
+            //         var prom = Q.defer();
+            //         console.log("received ==========> "  + JSON.stringify(value));
+            //         prom.resolve(value);
+            //         finalPromiseArray.push(prom.promise);
+            //     });
+
+
+          // // }
+          //  promiseArray.then(function(value){
+          //           console.log('values ------> ' + JSON.stringify(value));
+          //       });
+
+
+          console.log(JSON.stringify(promiseArray));
+          console.log(typeof promiseArray);
+
+
+        });
+        // prom.resolve(finalPromiseArray);
+        return Promise.all(finalPromiseArray);
       }
   }
 
   function getBuildStopUrl(jobUrl) {
-    var jobStatusApi = jobUrl + 'api/json';
-    
     var stopUrlPromise = Q.defer();
+    if(jobUrl instanceof Array) {
+      var jobStatusApi = [];
+      u_.each(jobUrl, function(joburl){
+        jobStatusApi.push(joburl);
+      });
+          var stopUrlPromiseArray = [];
 
-    getBuildId(jobStatusApi).then(
-      function(buildStopObject){
-        stopUrlPromise.resolve(getBuildStopObjct(buildStopObject));
-    });
+          getBuildId(jobStatusApi).then(function(buildStopObject){
+                    console.log('after getBuildId');
+                    u_.each(buildStopObject, function(value){
+                       var stopUrlpromise = Q.defer();
+                    // console.log("build====== " + JSON.stringify(value));
+                       stopUrlpromise.resolve(getBuildStopObjct(value))
+                       stopUrlPromiseArray.push(stopUrlpromise.promise);
+                    });
+              stopUrlPromise.resolve(Promise.all(stopUrlPromiseArray));
+          });
+          return stopUrlPromise.promise;
+
+    }
+    else {
+      var jobStatusApi = jobUrl;
+          getBuildId(jobStatusApi).then(function(buildStopObject){
+          stopUrlPromise.resolve(getBuildStopObjct(buildStopObject));  
+          });
+        return stopUrlPromise.promise;
+    }
+
+    
+
     function getBuildStopObjct(buildStop) {
         var buildStopObject = [];
         console.log("inside build stop function");     
          if(buildStop.buildId !== ""){
             if(buildStop.isQueue) {
-              buildStopObject = [jobUrl,buildStop.buildId, true];
+              buildStopObject = [buildStop.build_url,buildStop.buildId, true];
             }
             else{
-              buildStopObject = [jobUrl,buildStop.buildId, false];
+              buildStopObject = [buildStop.build_url,buildStop.buildId, false];
             }
          }
          console.log("build stop object: " + buildStopObject);
          return buildStopObject;
     }
+  }
 
-    return stopUrlPromise.promise;
- }
-
-  function getBuildId(jobUrl) {
-       var lastBuild = "";
-       var lastCompletedBuild = "";
-       var isQueue = false;
-       var buildPromise = Q.defer();
-       var buildId = [];
-
-      // console.log('calling job api with url: ' + jobUrl);
-        request({url:jobUrl,method:'GET'}, 
-                function (error, response, body) {
+  function getBuildId(jobUrl){
+      var requestFunction = function(joburl){
+         var buildPromise = Q.defer();
+         var lastBuild = "";
+         var lastCompletedBuild = "";
+         var isQueue = false;
+         var buildId = [];
+         request({url:joburl+'api/json',method:'GET'}, function (error, response, body) {
                  if (!error && response.statusCode == 200) {
                       // console.log('json reponse for build api: '+body);
                       lastBuild = JSON.parse(body).lastBuild.number;
@@ -503,14 +593,17 @@ module.exports = function (app, addon) {
                             buildPromise.resolve({
                             "buildId" : lastBuild,
                             "message" : "Only job running is with build no " + lastBuild,
-                            "isQueue" : false }
+                            "isQueue" : false ,
+                            "build_url": joburl
+                            }
                             );
                           }
                           else {
                             buildPromise.resolve( {
                               "buildId" : lastBuild,
                               "message" : "multiple job scheduled",
-                              "isQueue" : true
+                              "isQueue" : true,
+                              "build_url": joburl
                             });
                           }
                       }
@@ -520,7 +613,8 @@ module.exports = function (app, addon) {
                          buildPromise.resolve( {
                             "buildId" : "",
                             "message" : "Nothing to abort!",
-                            "isQueue" : false
+                            "isQueue" : false,
+                            "build_url": joburl
                         });
                       }
 
@@ -531,7 +625,21 @@ module.exports = function (app, addon) {
                 }     
         });
         return buildPromise.promise;
-  }
+      };
+
+      console.log('calling job api with url: ' + jobUrl);
+      if(jobUrl instanceof Array) {
+        var urlPromiseArray = Q.defer()
+        var buildPromiseArray = [];
+        u_.each(jobUrl, function(joburl){
+          buildPromiseArray.push(requestFunction(joburl));
+        });
+        return Promise.all(buildPromiseArray);
+      }
+      else {
+                 return requestFunction(jobUrl);
+      }
+}
 
   function parseCommand(cmd) {
     var commandInfo = {};
@@ -655,5 +763,4 @@ module.exports = function (app, addon) {
       });
     });
   });
-
 };
