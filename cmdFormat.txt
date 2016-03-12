@@ -9,6 +9,7 @@ Environment: prod/stage/qa cluster
 			 a1/a2/a3/a4 or z1/z2/z3/z4
 			 a1&a2/a1&a4 (order will depend on the command)
 			 a1&a2&a4
+			 a1&z4
 			 
 Project: Denim -> for all the jobs.
 		 Room System
@@ -24,7 +25,6 @@ Run Command:
 
 -> make the command case insensitive.
 -> implement command for env combinations.
--> 
 
 Stop command:
 /DenimAutomator Stop Webrtc:

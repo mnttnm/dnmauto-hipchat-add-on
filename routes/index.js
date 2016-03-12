@@ -198,7 +198,6 @@ module.exports = function (app, addon) {
                                     u_.each(builds, function(build) {
                                          buildUrlObject.buildUrl.push(getFinalBuildUrl(build,commandInfo))
                                     });
-                                    console.log();
                                     console.log(buildUrlObject.buildUrl);
                                     run(buildUrlObject);
                           }
@@ -236,9 +235,8 @@ module.exports = function (app, addon) {
                           buildUrlObject.buildUrl = []; //will return array of build urls for denim. 
                           var stopPromisesArray = [];
                           stopJobForCurrentProject("denim").then(function(data){
-                              var stopPromise = Q.defer();
-                              Promise.all(data).then(function(values){
-                                  u_.each(values,function(value){
+                                  u_.each(data,function(value){
+                                    var stopPromise = Q.defer();
                                     if(value.length > 0){
                                       stopPromise.resolve({
                                         "message" :"Stopping all the jobs of " + commandInfo.project,
@@ -249,15 +247,13 @@ module.exports = function (app, addon) {
                                     }
                                     else {
                                         stopPromise.resolve({
-                                          // var buildUrlObject = {};
                                         "buildId" : "",
                                         "message" : "There is nothing to stop for " + commandInfo.project,
                                       });   
                                     }
                                     finalStopArray.push(stopPromise.promise);
-                                    promQ.resolve(finalStopArray);
                                   });
-                              });
+                                  promQ.resolve(finalStopArray);
                           });
                           stopJob(promQ.promise);
                           break;  
@@ -389,13 +385,13 @@ module.exports = function (app, addon) {
 
     var processStopPromise = function(buildStopObject){
         console.log("stop buildUrl object is: " + JSON.stringify(buildStopObject));
-        
+        console.log(buildStopObject.jobUrl+buildStopObject.buildId);
         if (Object.keys(buildStopObject).length !== 0)  {
           if(buildStopObject.buildId != ""){
             if(buildStopObject.isQueue == false){
               request(
                     {
-                      url:buildStopObject.build_url+buildStopObject.buildId+'/stop',
+                      url:buildStopObject.jobUrl+buildStopObject.buildId+'/stop',
                       method: 'POST'
                     }, 
                     function (error, response, body) {
@@ -405,6 +401,8 @@ module.exports = function (app, addon) {
                           sendMessage(msg,"green");
                        }
                        else {
+                          console.log(error);
+                          console.log(response);
                           var msg = "Stop operation not successful!"
                           sendMessage(msg,"red");
                        }
@@ -425,13 +423,6 @@ module.exports = function (app, addon) {
           }
         }    
       };
-    // if(stop instanceof Array) {
-    //   Promise.all(stop).then(function(values){
-    //       u_.each(values, function(value){
-    //           processStopPromise(value);
-    //       })
-    //   });
-    // }
 
     if(Q.isPromise(stop)) {
         stop.then(function(value){
@@ -475,7 +466,7 @@ module.exports = function (app, addon) {
       var prom = Q.defer();
       var promiseArray = [];
 
-      if(jobList.hasOwnProperty(project)) {
+      if(jobList.hasOwnProperty(project) && project != 'denim') {
           var jobUrl  = jobList[project]['job_url'];
           console.log("job url of project is: " + JSON.stringify(jobUrl));
           getBuildStopUrl(jobUrl).then(function(buildUrlObject){
@@ -487,7 +478,6 @@ module.exports = function (app, addon) {
 
       else if (project == 'denim') {             
               var prom = Q.defer();
-              var finalPromiseArray = [];
               var jobUrls = [];
 
         u_.each(Object.keys(jobList), function(key) {
@@ -497,30 +487,10 @@ module.exports = function (app, addon) {
         });
 
         getBuildStopUrl(jobUrls).then(function(promiseArray) {
-          // if(promiseArray instanceof Promise) {
-            // console.log('* * * * * * * *');
-            //  console.log('resolving promise inside getBuildStopUrl');
-            //     u_.each(promiseArray, function(value){
-            //         var prom = Q.defer();
-            //         console.log("received ==========> "  + JSON.stringify(value));
-            //         prom.resolve(value);
-            //         finalPromiseArray.push(prom.promise);
-            //     });
-
-
-          // // }
-          //  promiseArray.then(function(value){
-          //           console.log('values ------> ' + JSON.stringify(value));
-          //       });
-
-
           console.log(JSON.stringify(promiseArray));
-          console.log(typeof promiseArray);
-
-
+          prom.resolve(promiseArray);
         });
-        // prom.resolve(finalPromiseArray);
-        return Promise.all(finalPromiseArray);
+          return prom.promise;
       }
   }
 
@@ -537,7 +507,6 @@ module.exports = function (app, addon) {
                     console.log('after getBuildId');
                     u_.each(buildStopObject, function(value){
                        var stopUrlpromise = Q.defer();
-                    // console.log("build====== " + JSON.stringify(value));
                        stopUrlpromise.resolve(getBuildStopObjct(value))
                        stopUrlPromiseArray.push(stopUrlpromise.promise);
                     });
@@ -558,7 +527,8 @@ module.exports = function (app, addon) {
 
     function getBuildStopObjct(buildStop) {
         var buildStopObject = [];
-        console.log("inside build stop function");     
+        console.log("inside build stop function");
+        console.log(buildStop);     
          if(buildStop.buildId !== ""){
             if(buildStop.isQueue) {
               buildStopObject = [buildStop.build_url,buildStop.buildId, true];
@@ -629,7 +599,6 @@ module.exports = function (app, addon) {
 
       console.log('calling job api with url: ' + jobUrl);
       if(jobUrl instanceof Array) {
-        var urlPromiseArray = Q.defer()
         var buildPromiseArray = [];
         u_.each(jobUrl, function(joburl){
           buildPromiseArray.push(requestFunction(joburl));
@@ -648,6 +617,7 @@ module.exports = function (app, addon) {
     var fullCommand = cmd.substr(cmd.indexOf(" ") + 1, cmd.length - 1);
 
     var commandArray = fullCommand.split(" ");
+
 
     if(commandArray.length == 2 || commandArray.length == 6) {
       if(commandArray.length == 2) {
@@ -671,8 +641,11 @@ module.exports = function (app, addon) {
             }
       }
       else {
+
             var projectName = checkIfProjectPresent(commandArray[5]);
-            if(projectName != false) {
+            var isEnvValid = checkIfEnvValid(commandArray[3]);
+
+            if(projectName && isEnvValid) {
                 commandInfo.command = commandArray[0];
                 commandInfo.operation = commandArray [1];
                 commandInfo.environment = commandArray [3];
@@ -704,6 +677,18 @@ module.exports = function (app, addon) {
     else {
       return isProjectValid;
     }
+  }
+
+  function checkIfEnvValid(Env) {
+      console.log("inside env check function: " + Env);
+      var pattern = new RegExp("(a[1-4])|(z[1-4])|(q[1-4])");
+      var isValid = pattern.test(Env);
+      var envNotValidMsg =   "\'" + Env + "\'" + ' is not a correct Env, correct and re-enter the command!';
+
+      if(!isValid) {
+        sendMessage(envNotValidMsg,"red");
+      }
+      return isValid;
   }
 
   function getFinalBuildUrl(currentProject,commandInfo){

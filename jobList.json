@@ -143,7 +143,7 @@
 			"q3": "q31"
 		},
 		"sanity": "@skinny-smoke,@skinny-sanity",
-		"smoke": "@skiny-smoke",
+		"smoke": "@skinny-smoke",
 		"mapping": {
 			"Env": "Env",
 			"Tag": "Tags"
