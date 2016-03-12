@@ -158,8 +158,40 @@ module.exports = function (app, addon) {
     function (req, res) {
       roomRes = res;
       roomReq = req;
-      var command = req.body.item.message.message;  //command will get the complete message passed from hipchat.
-      processCommand(command);
+      var command = req.body.item.message.message; 
+
+      console.log('command received is: ' + command);
+           var commandInfo = {};
+           commandInfo = parseCommand(command);
+
+           if(Object.keys(commandInfo).length == 0) {
+             console.log("command: " + command + " is invalid or Missing some parameters");
+             return buildUrlObject;
+           }
+
+           // For each environment trigger all the project.
+           else {
+              if(commandInfo.command.toLowerCase() == 'run') {
+                u_.each(commandInfo.environment, function(env){
+                  u_.each(commandInfo.project, function(project){
+                    var commandObject = JSON.parse(JSON.stringify(commandInfo));
+                    commandObject.environment = env;
+                    commandObject.project = project;
+                    console.log(commandObject);
+                    processCommand(commandObject);
+                  }); 
+                });
+              }
+            else if(commandInfo.command.toLowerCase() == 'stop') {
+                 u_.each(commandInfo.project, function(project){
+                    var commandObject = JSON.parse(JSON.stringify(commandInfo));
+                    commandObject.project = project;
+                    console.log(commandObject);
+                    processCommand(commandObject);
+                  })
+            }  
+
+           }
   });
 
 
@@ -173,20 +205,9 @@ module.exports = function (app, addon) {
      hipchat.sendMessage(roomReq.clientInfo, roomReq.context.item.room.id,message,options);
   }
 
-  function processCommand(command) {
-      var commandInfo = {};
-      commandInfo = parseCommand(command);
-      var buildUrlObject = {};
-      //We can have one more parameter which can have values like http reponsecode for indicating that this function was successfurl or not.
-
-      if(Object.keys(commandInfo).length == 0) {
-        console.log("command: " + command + " is invalid or Missing some parameters");
-        return buildUrlObject;
-      }
-
-      else {
-        //based on run/stop or status we will form our urls
-        switch (commandInfo.command.toLowerCase())  {
+  function processCommand(commandInfo) {
+        var buildUrlObject = {};
+        switch (commandInfo.command.toLowerCase()) {
             case "run": 
                 switch (commandInfo.project){
                     case "Denim":
@@ -293,7 +314,7 @@ module.exports = function (app, addon) {
                    return buildUrlObject;
                    break;
         }
-      }
+      // }
   }
 
   function run(buildUrlObject){
@@ -370,11 +391,12 @@ module.exports = function (app, addon) {
                           };
                           setTimeout(function() {
                             processStopUrl(jobUrl,buildId+1)
-                          }, 1000);
+                          }, 3000);
                           // hipchat.sendMessage(req.clientInfo, req.context.item.room.id,msg,options);
                        }
                        else if (response.statusCode == 404) {
                           console.log('stop operation completed!');
+                          sendMessage('stop operation completed!',"green");
                        }
                        else {
                           var msg = "Stop operation not successful!"
@@ -610,15 +632,11 @@ module.exports = function (app, addon) {
       }
 }
 
-  function parseCommand(cmd) {
-    var commandInfo = {};
-    console.log('command received is: ' + cmd);
-
-    var fullCommand = cmd.substr(cmd.indexOf(" ") + 1, cmd.length - 1);
-
+  function parseCommand(command) {
+    var fullCommand = command.substr(command.indexOf(" ") + 1, command.length - 1);
     var commandArray = fullCommand.split(" ");
 
-
+    var commandInfo = {};
     if(commandArray.length == 2 || commandArray.length == 6) {
       if(commandArray.length == 2) {
             if(commandArray[1].toLowerCase() == 'denim') {
@@ -629,35 +647,78 @@ module.exports = function (app, addon) {
                   return commandInfo;
             }
             else {
-              console.log('inside project block');
-              var projectName = checkIfProjectPresent(commandArray[1]);
-                if(commandArray[0].toLowerCase() == 'stop' &&  projectName != false){
-                  commandInfo.command = commandArray[0];
-                  commandInfo.project = projectName;
-                  console.log('Command after parsing: ' + commandInfo);
+                  var projectSplitArray = commandArray[1].split("&");
+                  console.log(JSON.stringify(projectSplitArray));
+                  var isProjectCorrect = true;
+
+                  var projectArray = [];
+                  u_.each(projectSplitArray, function(project) {
+                      if(checkIfProjectPresent(project)) {
+                        projectArray.push(checkIfProjectPresent(project))
+                      }
+                      else {
+                        isProjectCorrect = false;
+                      }
+                  });
+
+                  if(commandArray[0].toLowerCase() == 'stop' &&  isProjectCorrect){
+                    commandInfo.command = commandArray[0];
+                    commandInfo.project = projectArray;
+                    console.log('Command after parsing: ' + JSON.stringify(commandInfo));
+                    return commandInfo;
+                  }
+                else 
                   return commandInfo;
-                }
-                else return commandInfo;
             }
       }
+
       else {
 
-            var projectName = checkIfProjectPresent(commandArray[5]);
-            var isEnvValid = checkIfEnvValid(commandArray[3]);
+        var projectSplitArray = commandArray[5].split("&");
+        console.log(JSON.stringify(projectSplitArray));
+        var isProjectCorrect = true;
 
-            if(projectName && isEnvValid) {
+        var projectArray = [];
+        u_.each(projectSplitArray, function(project) {
+              if(checkIfProjectPresent(project)) {
+                projectArray.push(checkIfProjectPresent(project))
+              }
+              else {
+                isProjectCorrect = false;
+              }
+        });
+
+        var envSplitArray = commandArray[3].split("&");
+        console.log(JSON.stringify(envSplitArray));
+        var isEnvCorrect = true;
+
+
+        var envArray = [];
+        u_.each(envSplitArray, function(env) {
+              if(checkIfEnvValid(env)) {
+                envArray.push(env)
+              }
+              else {
+                isEnvCorrect = false;
+              }
+        });
+
+            if(isProjectCorrect && isEnvCorrect) {
                 commandInfo.command = commandArray[0];
                 commandInfo.operation = commandArray [1];
-                commandInfo.environment = commandArray [3];
-                commandInfo.project = projectName;
+                commandInfo.environment = envArray;
+                commandInfo.project = projectArray;
                 console.log(commandInfo);
+                console.log('Command parsing done!');
                 return commandInfo;
             }
             else return commandInfo;
       }
-    }  
+    }
+
     else {
         console.log('returning commandInfo as: ' + commandInfo);
+        sendMessage('Check command again!', 'red');
         return commandInfo;
     }
   }
